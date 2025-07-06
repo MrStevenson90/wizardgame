@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- ENHANCED: Mobile-optimized viewport and meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- PWA and mobile optimization -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    
+    <title>Wizard Adventure Game - Master the 'S' Shape</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animation.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/popups.css">
+    <link rel="stylesheet" href="css/mobile.css"><!-- NEW: Mobile-specific styles -->
+    
+    <!-- NEW: Preload nipple.js for faster mobile loading -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js" as="script">
+    
+    <!-- Prevent zooming on input focus (mobile) -->
+    <style>
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+        
+        /* Prevent pull-to-refresh */
+        body {
+            overscroll-behavior: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Disable text selection on mobile */
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Allow text selection for help content */
+        .help-content, .popup {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer"></div>
+
+    <div id="ui">
+        <div id="scoreDisplay" style="display: none;">Score: <span id="score">0</span></div>
+        <div id="spellCount">Perfect Spells: <span id="spells">0</span>/5</div>
+        <div id="instructions">Welcome to the Wizard Adventure! Master the 'S' shape to save your mentor.</div>
+        
+        <!-- Real-time accuracy display container -->
+        <div id="accuracyContainer" style="display: none;">
+            <div id="currentAccuracy">Accuracy: <span id="accuracyValue">0</span>%</div>
+            <div id="accuracyTip">Keep tracing the 'S' shape!</div>
+        </div>
+    </div>
+    
+    <!-- Drawing feedback overlay -->
+    <div id="drawingFeedback" class="drawing-overlay">
+        <div id="drawingInstructions" class="drawing-instructions hidden">
+            Start drawing near the 'S' shape!
+        </div>
+        <div id="proximityWarning" class="proximity-warning hidden">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-text">Draw closer to the 'S' shape!</div>
+        </div>
+    </div>
+    
+    <!-- Accuracy celebration effects -->
+    <div id="accuracyEffects" class="accuracy-effects">
+        <div id="successEffect" class="success-effect hidden">
+            <div class="success-icon">✨</div>
+            <div class="success-text">Perfect Tracing!</div>
+        </div>
+    </div>
+    
+    <div id="popups">
+        <!-- ENHANCED: Mobile-optimized cage unlock popup -->
+        <div id="cageUnlockPopup" class="popup hidden">
+            <h2>Break the Magical Seal!</h2>
+            <p class="instruction-detail">Start at the GREEN dot and follow the curved path to the RED dot.</p>
+            <div id="drawing-challenge-container" style="position: relative; width: 300px; height: 300px; margin: 20px auto; border: 1px solid #ffd700; background: rgba(0,0,0,0.2);">
+                <!-- SVG shows the template 'S' path for the user to follow -->
+                <svg id="s-path-template" width="300" height="300" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+                    <!-- Proper S-shape path from top to bottom -->
+                    <path d="M 220 60 C 180 60, 120 60, 120 100 C 120 140, 180 140, 180 180 C 180 220, 120 220, 80 220" 
+                          stroke="#ffd700" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="15, 10"/>
+                    <!-- Direction indicators -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
+                            <polygon points="0 0, 12 5, 0 10" fill="#ffd700" />
+                        </marker>
+                        <!-- Start point indicator -->
+                        <circle id="startPoint" cx="220" cy="60" r="8" fill="#00ff00" stroke="#ffffff" stroke-width="2"/>
+                        <!-- End point indicator -->
+                        <circle id="endPoint" cx="80" cy="220" r="8" fill="#ff0000" stroke="#ffffff" stroke-width="2"/>
+                    </defs>
+                    <!-- Direction arrow at the end -->
+                    <path d="M 220 60 C 180 60, 120 60, 120 100 C 120 140, 180 140, 180 180 C 180 220, 120 220, 80 220" 
+                          stroke="#ffd700" stroke-width="4" fill="none" marker-end="url(#arrowhead)" opacity="0.8"/>
+                </svg>
+                <!-- Visual indicators -->
+                <div style="position: absolute; top: 30px; right: 60px; background: rgba(0,255,0,0.8); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">START</div>
+                <div style="position: absolute; bottom: 50px; left: 50px; background: rgba(255,0,0,0.8); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">END</div>
+                <!-- The user will draw on this canvas -->
+                <canvas id="cageUnlockCanvas" width="300" height="300" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
+            </div>
+            <p id="accuracy-display">Accuracy: 0% (Need 50% or better)</p>
+            <!-- NEW: Mobile hint -->
+            <div class="mobile-hint">
+                💡 On mobile: Touch and drag to trace the 'S' shape
+            </div>
+        </div>
+
+        <div id="scene2Popup" class="popup hidden">
+            <h2>Master Your Magic!</h2>
+            <p>Practice the same 'S' shape on the magical rock to strengthen your spell.</p>
+            <p class="instruction-detail">Look for the glowing white 'S' rune on the rock and trace it the same way as before - from top to bottom.</p>
+            <div class="practice-goals">
+                <div class="goal-item">🎯 Goal: Cast 5 perfect spells</div>
+                <div class="goal-item">📏 Accuracy: 40% or higher</div>
+                <div class="goal-item">✨ Same S-shape as the popup</div>
+            </div>
+            <!-- NEW: Mobile control hint -->
+            <div class="mobile-hint">
+                🕹️ Use the joystick to move around, touch the screen to trace 'S' shapes
+            </div>
+            <button id="continueBtn">Begin Training</button>
+        </div>
+        
+        <!-- ENHANCED: Updated for mobile battle system -->
+        <div id="scene3Popup" class="popup hidden">
+            <h2>Defend Your Mentor!</h2>
+            <p>5 serpents approach! You must defeat them all to achieve victory.</p>
+            <p class="instruction-detail">Each serpent has a red 'S' rune floating above it. Trace the same S-shape you've mastered to put them to sleep.</p>
+            <div class="battle-objectives">
+                <div class="objective-header">🏆 Battle Objectives:</div>
+                <div class="objective-item">🐍 Defeat all 5 serpents</div>
+                <div class="objective-item">🎯 Trace red 'S' runes above snakes</div>
+                <div class="objective-item">📏 40%+ accuracy puts snakes to sleep</div>
+                <div class="objective-item">⭐ Score 5/5 for perfect victory!</div>
+            </div>
+            <div class="battle-strategy">
+                <div class="strategy-title">💡 Strategy Tips:</div>
+                <ul>
+                    <li>Use the same S-shape you practiced</li>
+                    <li class="mobile-tip">Touch near the red rune to start tracing</li>
+                    <li>Complete the full S from top to bottom</li>
+                    <li>Serpents approach slowly - take your time</li>
+                </ul>
+            </div>
+            <button id="defendBtn">Begin Battle</button>
+        </div>
+        
+        <!-- ENHANCED: Mobile-optimized game over popup -->
+        <div id="gameOverPopup" class="popup hidden">
+            <h2 id="gameOverTitle">Adventure Complete!</h2>
+            <p id="gameOverText">Congratulations! You've mastered the 'S' shape and saved your mentor!</p>
+            <div id="finalStats" class="final-stats">
+                <div class="stats-header">📊 Final Results:</div>
+                <div class="stat-item">⚡ Training Spells: <span id="finalTrainingSpells">0</span>/5</div>
+                <div class="stat-item">🐍 Serpents Defeated: <span id="finalSnakeScore">0</span>/5</div>
+                <div class="stat-item">🎯 Average Accuracy: <span id="finalAccuracy">0</span>%</div>
+                <div class="stat-item">🏆 Final Grade: <span id="finalGrade">Apprentice</span></div>
+            </div>
+            <div id="masteryCertificate" class="mastery-section hidden">
+            </div>
+            <button id="restartBtn">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Help overlay for controls and instructions -->
+    <div id="helpOverlay" class="help-overlay hidden">
+        <div class="help-content">
+            <h3>How to Play: Master the 'S' Shape</h3>
+            
+            <!-- NEW: Device-specific control sections -->
+            <div class="controls-section desktop-only">
+                <h4>Desktop Controls:</h4>
+                <ul>
+                    <li><kbd>W</kbd> - Move Forward</li>
+                    <li><kbd>S</kbd> - Move Backward</li>
+                    <li><kbd>A</kbd> - Turn Left</li>
+                    <li><kbd>D</kbd> - Turn Right</li>
+                    <li><kbd>Arrow Keys</kbd> - Alternative controls</li>
+                    <li><kbd>Mouse</kbd> - Click and drag to trace 'S' shapes</li>
+                </ul>
+            </div>
+            
+            <div class="controls-section mobile-only">
+                <h4>Mobile/Tablet Controls:</h4>
+                <ul>
+                    <li>🕹️ <strong>Joystick</strong> - Move and turn around</li>
+                    <li>✏️ <strong>Touch & Drag</strong> - Trace 'S' shapes</li>
+                    <li>📱 <strong>Fullscreen Button</strong> - Top-right corner for better experience</li>
+                    <li>🔄 <strong>Orientation</strong> - Landscape mode recommended</li>
+                </ul>
+            </div>
+            
+            <div class="drawing-section">
+                <h4>Drawing the 'S' Shape:</h4>
+                <ul>
+                    <li>Start your drawing near the 'S' shape</li>
+                    <li>Follow the curved path from top to bottom</li>
+                    <li>Watch the accuracy meter for feedback</li>
+                    <li>Complete the entire S-shape for best scores</li>
+                </ul>
+            </div>
+            
+            <div class="gameplay-section">
+                <h4>Game Progression:</h4>
+                <ul>
+                    <li><strong>Scene 1:</strong> Unlock the cage (50%+ accuracy)</li>
+                    <li><strong>Scene 2:</strong> Practice on the rock (5 perfect spells)</li>
+                    <li><strong>Scene 3:</strong> Battle 5 serpents (score 5/5 to win)</li>
+                </ul>
+            </div>
+            
+            <div class="tips-section">
+                <h4>Tips for Success:</h4>
+                <ul>
+                    <li>Take your time - accuracy matters more than speed</li>
+                    <li>The S-shape is the same in all three scenes</li>
+                    <li>Start at the beginning and trace to the end</li>
+                    <li>Practice makes perfect - don't give up!</li>
+                    <li class="mobile-tip">On mobile: Use landscape mode for better experience</li>
+                </ul>
+            </div>
+            
+            <button id="closeHelp">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Toggle help button -->
+    <button id="helpButton" class="help-button">?</button>
+
+    <!-- NEW: Loading screen for mobile -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Loading Wizard Adventure...</h2>
+            <p>Preparing your magical journey</p>
+            <div class="loading-progress">
+                <div class="loading-bar">
+                    <div class="loading-fill" id="loadingFill"></div>
+                </div>
+                <span id="loadingPercent">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Systems - Load before game scripts -->
+    <script src="music.js"></script>
+    <script src="fx.js"></script>
+    <script src="dialogue.js"></script>
+
+    <!-- NEW: Load nipple.js for mobile joystick support -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+
+    <!-- Three.js and main game scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+    
+    <!-- Initialize help system, restart functionality, and mobile features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpButton = document.getElementById('helpButton');
+            const helpOverlay = document.getElementById('helpOverlay');
+            const closeHelp = document.getElementById('closeHelp');
+            const restartBtn = document.getElementById('restartBtn');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            // NEW: Mobile detection and UI adaptation
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()) || window.innerWidth <= 768;
+            const isTouch = 'ontouchstart' in window;
+            
+            // Apply mobile-specific classes
+            if (isMobile || isTouch) {
+                document.body.classList.add('mobile-device');
+                
+                // Hide desktop-only elements, show mobile-only elements
+                const desktopElements = document.querySelectorAll('.desktop-only');
+                const mobileElements = document.querySelectorAll('.mobile-only');
+                
+                desktopElements.forEach(el => el.style.display = 'none');
+                mobileElements.forEach(el => el.style.display = 'block');
+                
+                // Add mobile hints to popups
+                const mobileHints = document.querySelectorAll('.mobile-hint');
+                mobileHints.forEach(hint => hint.style.display = 'block');
+                
+                console.log('📱 Mobile device detected, UI adapted');
+            } else {
+                document.body.classList.add('desktop-device');
+                
+                // Hide mobile-only elements
+                const mobileElements = document.querySelectorAll('.mobile-only, .mobile-hint, .mobile-tip');
+                mobileElements.forEach(el => el.style.display = 'none');
+                
+                console.log('🖥️ Desktop device detected');
+            }
+            
+            // NEW: Loading screen management
+            let loadingProgress = 0;
+            const loadingFill = document.getElementById('loadingFill');
+            const loadingPercent = document.getElementById('loadingPercent');
+            
+            const updateLoadingProgress = (percent) => {
+                loadingProgress = Math.min(100, percent);
+                if (loadingFill) loadingFill.style.width = `${loadingProgress}%`;
+                if (loadingPercent) loadingPercent.textContent = `${Math.round(loadingProgress)}%`;
+                
+                if (loadingProgress >= 100) {
+                    setTimeout(() => {
+                        if (loadingScreen) {
+                            loadingScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingScreen.style.display = 'none';
+                            }, 500);
+                        }
+                    }, 500);
+                }
+            };
+            
+            // Simulate loading progress
+            let progressInterval = setInterval(() => {
+                updateLoadingProgress(loadingProgress + Math.random() * 15);
+                if (loadingProgress >= 100) {
+                    clearInterval(progressInterval);
+                }
+            }, 200);
+            
+            // Complete loading when game is ready
+            window.addEventListener('gameReady', () => {
+                updateLoadingProgress(100);
+            });
+            
+            // Fallback: complete loading after 5 seconds
+            setTimeout(() => {
+                updateLoadingProgress(100);
+            }, 5000);
+            
+            // Help system
+            helpButton.addEventListener('click', function() {
+                helpOverlay.classList.remove('hidden');
+            });
+            
+            closeHelp.addEventListener('click', function() {
+                helpOverlay.classList.add('hidden');
+            });
+            
+            // Close help on escape key (desktop only)
+            if (!isMobile) {
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !helpOverlay.classList.contains('hidden')) {
+                        helpOverlay.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Restart functionality
+            restartBtn.addEventListener('click', function() {
+                // Reset audio systems for new game
+                if (window.musicSystem) {
+                    window.musicSystem.stop();
+                }
+                if (window.dialogueAudioSystem) {
+                    window.dialogueAudioSystem.reset();
+                }
+                
+                // Show loading screen for restart
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'flex';
+                    loadingScreen.style.opacity = '1';
+                    updateLoadingProgress(0);
+                    
+                    // Simulate restart loading
+                    let restartProgress = 0;
+                    const restartInterval = setInterval(() => {
+                        restartProgress += Math.random() * 20;
+                        updateLoadingProgress(restartProgress);
+                        if (restartProgress >= 100) {
+                            clearInterval(restartInterval);
+                            location.reload();
+                        }
+                    }, 100);
+                } else {
+                    location.reload();
+                }
+            });
+            
+            // Button interactions for scene popups
+            const continueBtn = document.getElementById('continueBtn');
+            const defendBtn = document.getElementById('defendBtn');
+            
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function() {
+                    document.getElementById('scene2Popup').classList.add('hidden');
+                });
+            }
+            
+            if (defendBtn) {
+                defendBtn.addEventListener('click', function() {
+                    document.getElementById('scene3Popup').classList.add('hidden');
+                });
+            }
+            
+            // NEW: Prevent zoom on double-tap (mobile)
+            if (isMobile) {
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', function (event) {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // Prevent context menu on long press
+                document.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+                
+                // Lock orientation to landscape for better gameplay (if supported)
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(err => {
+                        console.log('📱 Orientation lock not supported:', err);
+                    });
+                }
+            }
+            
+            // NEW: Visual feedback for touch interactions
+            if (isTouch) {
+                document.addEventListener('touchstart', function(e) {
+                    // Add touch ripple effect to buttons
+                    if (e.target.tagName === 'BUTTON') {
+                        e.target.classList.add('touch-active');
+                        setTimeout(() => {
+                            e.target.classList.remove('touch-active');
+                        }, 150);
+                    }
+                });
+            }
+            
+            // Performance monitoring for mobile
+            if (isMobile) {
+                let frameCount = 0;
+                let lastTime = performance.now();
+                
+                function monitorPerformance() {
+                    frameCount++;
+                    const currentTime = performance.now();
+                    
+                    if (currentTime >= lastTime + 1000) {
+                        const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                        
+                        if (fps < 30) {
+                            console.warn(`📱 Low FPS detected: ${fps}fps`);
+                            // Could trigger quality reduction here
+                        }
+                        
+                        frameCount = 0;
+                        lastTime = currentTime;
+                    }
+                    
+                    requestAnimationFrame(monitorPerformance);
+                }
+                
+                requestAnimationFrame(monitorPerformance);
+            }
+        });
+    </script>
+</body>
+</html>

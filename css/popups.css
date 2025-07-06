@@ -1,0 +1,326 @@
+/* css/popups.css */
+
+/* ===== BASE POPUP STYLES ===== */
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.95), rgba(60, 30, 90, 0.95));
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 35px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    width: 450px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: fadeIn 0.6s ease-out;
+    font-family: Arial, sans-serif;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #ffd700;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+}
+
+.popup p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* ===== ENHANCED EDUCATIONAL CONTENT ===== */
+.instruction-detail {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    font-style: italic;
+    color: #e0f7ff;
+    font-size: 16px;
+    border-left: 4px solid #00ffff;
+}
+
+.tracing-tips {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 20px;
+    border-left: 4px solid #ffd700;
+}
+
+.tracing-tips small {
+    color: #fffacd;
+    font-size: 14px;
+    display: block;
+    text-align: left;
+}
+
+/* ===== BUTTON STYLES ===== */
+.popup button {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: none;
+    padding: 18px 35px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 10px;
+}
+
+.popup button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+    animation: pulse 1s infinite;
+}
+
+.popup button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+/* ===== CAGE UNLOCK SPECIFIC STYLES ===== */
+#cageUnlockPopup {
+    width: 500px;
+}
+
+#drawing-challenge-container {
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(20, 20, 40, 0.6));
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.6),
+        0 0 30px rgba(255, 215, 0, 0.3);
+    border: 2px solid #ffd700;
+    position: relative;
+    overflow: hidden;
+}
+
+#drawing-challenge-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+    border-radius: 15px;
+    z-index: -1;
+    animation: borderGlow 2s linear infinite;
+}
+
+#s-path-template {
+    z-index: 1;
+}
+
+#cageUnlockCanvas {
+    z-index: 2;
+    border-radius: 13px;
+}
+
+#accuracy-display {
+    font-size: 22px;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #ffed4e;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 237, 78, 0.3);
+}
+
+/* ===== GAME OVER POPUP ENHANCEMENTS ===== */
+.final-stats {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+.final-stats div {
+    font-size: 18px;
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #00ffff;
+}
+
+.final-stats span {
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 0 0 5px #ffd700;
+}
+
+/* ===== SCENE-SPECIFIC POPUP ENHANCEMENTS ===== */
+#scene2Popup, #scene3Popup {
+    width: 480px;
+}
+
+#scene2Popup .instruction-detail {
+    border-left-color: #7cfc00;
+    background: rgba(124, 252, 0, 0.1);
+    border-color: rgba(124, 252, 0, 0.3);
+    color: #f0fff0;
+}
+
+#scene3Popup .instruction-detail {
+    border-left-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.3);
+    color: #ffe4e4;
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+.popup:focus-within {
+    outline: 3px solid #00ffff;
+    outline-offset: 5px;
+}
+
+.popup button:focus {
+    outline: 2px solid #00ffff;
+    outline-offset: 2px;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8) rotateY(-10deg);
+    }
+    to { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes borderGlow {
+    0% { 
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+    }
+    33% { 
+        background: linear-gradient(45deg, #ffed4e, #ffd700, #ffed4e);
+    }
+    66% { 
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+    }
+    100% { 
+        background: linear-gradient(45deg, #ffed4e, #ffd700, #ffed4e);
+    }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .popup {
+        width: 95% !important;
+        padding: 25px !important;
+        font-size: 16px;
+    }
+    
+    .popup h2 {
+        font-size: 24px !important;
+    }
+    
+    .popup p {
+        font-size: 16px !important;
+    }
+    
+    .popup button {
+        font-size: 18px !important;
+        padding: 15px 25px !important;
+    }
+    
+    #drawing-challenge-container {
+        width: 250px !important;
+        height: 250px !important;
+    }
+    
+    #cageUnlockCanvas {
+        width: 250px !important;
+        height: 250px !important;
+    }
+    
+    .instruction-detail {
+        font-size: 14px !important;
+        padding: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .popup {
+        margin: 10px;
+        max-height: 90vh;
+    }
+    
+    .popup h2 {
+        font-size: 20px !important;
+    }
+    
+    .popup p {
+        font-size: 14px !important;
+    }
+    
+    .popup button {
+        font-size: 16px !important;
+        padding: 12px 20px !important;
+    }
+    
+    #drawing-challenge-container {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    .final-stats {
+        padding: 15px !important;
+    }
+    
+    .final-stats div {
+        font-size: 16px !important;
+    }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+    .popup {
+        background: linear-gradient(135deg, rgba(20, 20, 40, 0.98), rgba(40, 20, 60, 0.98));
+    }
+    
+    .instruction-detail {
+        background: rgba(0, 255, 255, 0.15);
+    }
+    
+    .tracing-tips {
+        background: rgba(255, 215, 0, 0.15);
+    }
+}

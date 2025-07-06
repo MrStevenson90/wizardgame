@@ -1,0 +1,694 @@
+/* css/main.css - Complete Enhanced Version with Battle Counter Repositioned */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    overflow: hidden;
+    cursor: crosshair;
+}
+
+#gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ===== UI ELEMENTS ===== */
+#ui {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    color: #fff;
+    font-size: 18px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+#ui div {
+    margin-bottom: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 15px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+}
+
+/* UPDATED: Hide the score display */
+#scoreDisplay {
+    display: none !important;
+}
+
+/* ENHANCED: Style spell counter like battle counter */
+#spellCount {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 20, 40, 0.9)) !important;
+    border: 3px solid #00ffff !important;
+    border-radius: 15px !important;
+    padding: 20px 25px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    min-width: 200px !important;
+    transition: all 0.3s ease !important;
+}
+
+#spellCount:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 35px rgba(0, 255, 255, 0.8) !important;
+}
+
+/* ENHANCED: Instructions styling */
+#instructions {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 40, 0.85)) !important;
+    border: 2px solid #ffd700 !important;
+    border-radius: 12px !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    max-width: 400px !important;
+    line-height: 1.4 !important;
+}
+
+/* NEW: Real-time accuracy container */
+#accuracyContainer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ffff;
+    border-radius: 15px;
+    padding: 15px;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    z-index: 150;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+#currentAccuracy {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#accuracyTip {
+    font-size: 14px;
+    color: #cccccc;
+    font-style: italic;
+}
+
+#accuracyValue {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+}
+
+/* ===== DRAWING FEEDBACK OVERLAY ===== */
+.drawing-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 200;
+}
+
+.drawing-instructions {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ffff;
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.drawing-instructions.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+    pointer-events: none;
+}
+
+/* ===== PROXIMITY WARNING ===== */
+.proximity-warning {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 100, 100, 0.95);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid #ff4444;
+    box-shadow: 0 0 30px rgba(255, 68, 68, 0.7);
+    z-index: 250;
+    transition: all 0.3s ease;
+}
+
+.proximity-warning.hidden {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+    pointer-events: none;
+}
+
+.warning-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    animation: pulse 1s infinite;
+}
+
+.warning-text {
+    font-size: 16px;
+}
+
+/* ===== ACCURACY EFFECTS ===== */
+.accuracy-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 300;
+}
+
+.success-effect {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #00ff00, #7cfc00);
+    color: #003300;
+    padding: 25px 35px;
+    border-radius: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid #00ff00;
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+    transition: all 0.5s ease;
+}
+
+.success-effect.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+.success-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: sparkle 1s ease-in-out;
+}
+
+.success-text {
+    font-size: 18px;
+}
+
+/* ===== DRAWING TRAIL CANVAS ===== */
+#drawingTrail {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 10 !important;
+    background: transparent !important;
+    transition: opacity 0.3s ease;
+}
+
+/* ===== ENHANCED BATTLE PHASE STYLES ===== */
+
+/* Snake targeting indicator */
+#snakeTargetingIndicator {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border: 4px solid #ff4444;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+    animation: targetPulse 1s infinite;
+}
+
+/* Battle accuracy indicator */
+#battleAccuracyIndicator {
+    position: fixed;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #ff4444;
+    border-radius: 20px;
+    padding: 15px 25px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 150;
+    display: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
+    text-align: center;
+    min-width: 250px;
+}
+
+/* UPDATED: Enhanced battle counter positioned for desktop only - moved down significantly */
+.battle-counter {
+    position: fixed;
+    top: 180px; /* MOVED: Positioned to completely clear Perfect Spells counter and instructions */
+    left: 20px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 0, 0, 0.9));
+    color: #fff;
+    padding: 20px 25px;
+    border-radius: 15px;
+    border: 3px solid #ff4444;
+    box-shadow: 0 0 25px rgba(255, 68, 68, 0.6);
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 150;
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+    transition: all 0.3s ease;
+}
+
+.battle-counter:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 35px rgba(255, 68, 68, 0.8);
+}
+
+.snake-progress {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #ffaaaa;
+}
+
+/* Drawing feedback enhancements */
+.proximity-warning-battle {
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(255, 100, 100, 0.95), rgba(200, 50, 50, 0.9));
+    color: white;
+    padding: 25px 35px;
+    border-radius: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border: 4px solid #ff4444;
+    box-shadow: 0 0 40px rgba(255, 68, 68, 0.8);
+    z-index: 1000;
+    max-width: 450px;
+    animation: warningSlideIn 0.5s ease-out;
+}
+
+/* Success feedback for battle */
+.battle-success-feedback {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #00ff00, #7cfc00);
+    color: #003300;
+    padding: 30px 40px;
+    border-radius: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    border: 4px solid #00ff00;
+    box-shadow: 0 0 50px rgba(0, 255, 0, 0.9);
+    z-index: 1500;
+    animation: successBurst 0.8s ease-out;
+}
+
+/* Rune highlight effects */
+.rune-highlight {
+    filter: brightness(1.5) saturate(1.3);
+    animation: runeGlow 1s infinite alternate;
+}
+
+/* Enhanced trail styling for different accuracy levels */
+.trail-excellent {
+    filter: drop-shadow(0 0 8px #00ff00);
+}
+
+.trail-good {
+    filter: drop-shadow(0 0 6px #ffff00);
+}
+
+.trail-okay {
+    filter: drop-shadow(0 0 4px #ff8800);
+}
+
+.trail-poor {
+    filter: drop-shadow(0 0 2px #ff0000);
+}
+
+/* ===== HELP SYSTEM ===== */
+.help-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2, #7bb3f0);
+    border: 3px solid #ffffff;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 120;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+    transition: all 0.3s ease;
+}
+
+.help-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.6);
+}
+
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.help-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.help-content {
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.95), rgba(60, 30, 90, 0.95));
+    border: 2px solid #ffd700;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: white;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+.help-content h3 {
+    font-size: 28px;
+    color: #ffd700;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.help-content h4 {
+    font-size: 20px;
+    color: #ffed4e;
+    margin: 20px 0 10px 0;
+    border-bottom: 1px solid rgba(255, 237, 78, 0.3);
+    padding-bottom: 5px;
+}
+
+.help-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.help-content li {
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #00ffff;
+}
+
+.help-content kbd {
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: monospace;
+    font-weight: bold;
+    color: #ffd700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.help-content button {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 30px;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.help-content button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+/* ===== REAL-TIME ACCURACY DISPLAY ===== */
+#realTimeAccuracy {
+    position: fixed;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-size: 22px;
+    font-weight: bold;
+    z-index: 150;
+    border: 3px solid #00ffff;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes sparkle {
+    0% { transform: scale(1) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+    100% { transform: scale(1) rotate(360deg); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    25% { transform: translateX(-55%) translateY(-5px); }
+    75% { transform: translateX(-45%) translateY(5px); }
+}
+
+@keyframes accuracyPop {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    25% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    75% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+/* ===== ENHANCED BATTLE ANIMATIONS ===== */
+@keyframes targetPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.8; 
+        border-color: #ff4444;
+    }
+    50% { 
+        transform: scale(1.2); 
+        opacity: 1; 
+        border-color: #ff8888;
+    }
+}
+
+@keyframes battlePulse {
+    0%, 100% { 
+        box-shadow: 0 0 25px rgba(255, 68, 68, 0.6);
+        border-color: #ff4444;
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(255, 68, 68, 0.9);
+        border-color: #ff6666;
+    }
+}
+
+@keyframes accuracyGlow {
+    0%, 100% { 
+        box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(255, 68, 68, 0.8);
+    }
+}
+
+@keyframes warningSlideIn {
+    0% { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(-30px) scale(0.8);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+@keyframes successBurst {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+    }
+    50% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes runeGlow {
+    0% { 
+        filter: brightness(1.2) saturate(1.1);
+        text-shadow: 0 0 10px rgba(255, 68, 68, 0.8);
+    }
+    100% { 
+        filter: brightness(1.8) saturate(1.5);
+        text-shadow: 0 0 20px rgba(255, 68, 68, 1.0);
+    }
+}
+
+@keyframes celebrationFloat {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* ===== DESKTOP-ONLY RESPONSIVENESS (Simplified) ===== */
+@media (max-width: 768px) {
+    #ui {
+        font-size: 14px;
+        top: 10px;
+        left: 10px;
+    }
+    
+    #ui div {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+    
+    /* Desktop app - simplified mobile handling */
+    .battle-counter {
+        top: 180px;
+        left: 10px;
+        right: 10px;
+        font-size: 16px;
+        padding: 15px 20px;
+        min-width: auto;
+    }
+    
+    #battleAccuracyIndicator {
+        bottom: 10%;
+        font-size: 18px;
+        padding: 12px 20px;
+        min-width: 200px;
+    }
+    
+    .help-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .help-content {
+        padding: 25px;
+        margin: 20px;
+    }
+    
+    #realTimeAccuracy {
+        font-size: 18px;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    #ui {
+        font-size: 12px;
+    }
+    
+    /* Desktop app - simplified small screen handling */
+    .battle-counter {
+        top: 180px;
+        font-size: 14px;
+        padding: 12px 15px;
+    }
+    
+    #battleAccuracyIndicator {
+        font-size: 16px;
+        padding: 10px 15px;
+        min-width: 180px;
+    }
+    
+    .help-content h3 {
+        font-size: 20px;
+    }
+    
+    .help-content h4 {
+        font-size: 16px;
+    }
+    
+    #realTimeAccuracy {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+}
