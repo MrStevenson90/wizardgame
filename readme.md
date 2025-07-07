@@ -1,6 +1,8 @@
 # Wizard Adventure Game - Master the 'S' Shape
 ## 🎮 Cross-Platform Educational 3D Web Game with Full Mobile Support
 
+DEMO: thewizardgame.netlify.app 
+
 ![Wizard Adventure Game Overview](img/1.png)
 ![Technology Stack - JavaScript ES6 & Three.js](img/2.png)
 ![Educational Focus - Dyslexia Learning Support](img/3.png)
