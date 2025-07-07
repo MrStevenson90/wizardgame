@@ -227,12 +227,5 @@ export class CharacterController {
             this.movementSettings[phase].maxTurnSpeed *= turnSpeedMultiplier;
         });
         console.log(`🎮 Speed adjusted: Move x${moveSpeedMultiplier}, Turn x${turnSpeedMultiplier}`);
-        console.log(`🎮 New speeds - Chamber: ${this.movementSettings.chamber.maxMoveSpeed.toFixed(1)} move, ${this.movementSettings.chamber.maxTurnSpeed.toFixed(1)} turn`);
-    }
-
-    // NEW: Emergency speed reduction (for very sensitive users)
-    makeEvenSlower(factor = 0.7) {
-        this.adjustMaxSpeeds(factor, factor * 0.8); // Turn speed reduced even more
-        console.log(`🎮 Applied emergency slow-down factor: ${factor}`);
     }
 }
