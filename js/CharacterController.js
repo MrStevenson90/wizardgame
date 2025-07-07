@@ -1,4 +1,4 @@
-// js/CharacterController.js
+// js/CharacterController.js - Enhanced with smooth movement and speed limits
 
 export class CharacterController {
     constructor(player) {
@@ -9,30 +9,30 @@ export class CharacterController {
         // Enhanced movement settings with acceleration and max speeds
         this.movementSettings = {
             chamber: { 
-                maxMoveSpeed: 200.0,        // Reduced from 294 for smoother exploration
-                maxTurnSpeed: 15.0,         // Reduced from 23.52 for smoother turning
-                acceleration: 800.0,        // Speed of acceleration
-                deceleration: 1200.0,       // Speed of deceleration (faster than acceleration)
-                turnAcceleration: 60.0,     // Turn acceleration
-                turnDeceleration: 80.0,     // Turn deceleration (faster than acceleration)
+                maxMoveSpeed: 120.0,        // Further reduced for very smooth exploration
+                maxTurnSpeed: 8.0,          // Much slower turning for precise control
+                acceleration: 600.0,        // Slower acceleration for smoother feel
+                deceleration: 900.0,        // Speed of deceleration (faster than acceleration)
+                turnAcceleration: 35.0,     // Much slower turn acceleration
+                turnDeceleration: 50.0,     // Turn deceleration (faster than acceleration)
                 bounds: { minX: -95, maxX: 95, minZ: -95, maxZ: 95 }
             },
             practice: { 
-                maxMoveSpeed: 400.0,        // Reduced from 600 for better control
-                maxTurnSpeed: 30.0,         // Reduced from 48 for smoother turning
-                acceleration: 1000.0,
-                deceleration: 1400.0,
-                turnAcceleration: 120.0,
-                turnDeceleration: 160.0,
+                maxMoveSpeed: 200.0,        // Significantly reduced for better control
+                maxTurnSpeed: 12.0,         // Much slower turning for learning precision
+                acceleration: 800.0,
+                deceleration: 1100.0,
+                turnAcceleration: 50.0,
+                turnDeceleration: 70.0,
                 bounds: { minX: -95, maxX: 95, minZ: -95, maxZ: 95 }
             },
             battle: { 
-                maxMoveSpeed: 450.0,        // Slightly faster than practice but still controlled
-                maxTurnSpeed: 35.0,         // Faster turning for combat but still smooth
-                acceleration: 1200.0,       // Faster acceleration for combat responsiveness
-                deceleration: 1600.0,
-                turnAcceleration: 140.0,
-                turnDeceleration: 180.0,
+                maxMoveSpeed: 250.0,        // Reduced for better combat control
+                maxTurnSpeed: 15.0,         // Much slower turning even in combat
+                acceleration: 1000.0,       // Moderate acceleration for combat
+                deceleration: 1300.0,
+                turnAcceleration: 60.0,
+                turnDeceleration: 80.0,
                 bounds: { minX: -95, maxX: 95, minZ: -95, maxZ: 95 }
             }
         };
@@ -227,5 +227,12 @@ export class CharacterController {
             this.movementSettings[phase].maxTurnSpeed *= turnSpeedMultiplier;
         });
         console.log(`🎮 Speed adjusted: Move x${moveSpeedMultiplier}, Turn x${turnSpeedMultiplier}`);
+        console.log(`🎮 New speeds - Chamber: ${this.movementSettings.chamber.maxMoveSpeed.toFixed(1)} move, ${this.movementSettings.chamber.maxTurnSpeed.toFixed(1)} turn`);
+    }
+
+    // NEW: Emergency speed reduction (for very sensitive users)
+    makeEvenSlower(factor = 0.7) {
+        this.adjustMaxSpeeds(factor, factor * 0.8); // Turn speed reduced even more
+        console.log(`🎮 Applied emergency slow-down factor: ${factor}`);
     }
 }
